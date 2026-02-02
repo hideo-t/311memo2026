@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3.11メモリークエスト：#9へ集合</title>
+    <link rel="stylesheet" href="quest-style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- スコアゲージ -->
+        <div class="gauge-container" id="gaugeContainer">
+            <div class="gauge">
+                <div class="gauge-label">MEMORY</div>
+                <div class="gauge-bar">
+                    <div class="gauge-fill memory" id="memoryGauge"></div>
+                </div>
+            </div>
+            <div class="gauge">
+                <div class="gauge-label">HOPE</div>
+                <div class="gauge-bar">
+                    <div class="gauge-fill hope" id="hopeGauge"></div>
+                </div>
+            </div>
+            <div class="gauge">
+                <div class="gauge-label">LINK</div>
+                <div class="gauge-bar">
+                    <div class="gauge-fill link" id="linkGauge"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stage 0: タイトル画面 -->
+        <div class="stage active" id="stage0">
+            <div class="title-screen">
+                <div class="title-badge">第5回</div>
+                <h1 class="title-main">福島の子供たちのために</h1>
+                <h2 class="title-sub">3.11 〜あの日を忘れない〜</h2>
+                <div class="title-info">
+                    <div class="info-badge">入場無料</div>
+                    <div class="info-badge">全席自由</div>
+                </div>
+                <button class="start-button" onclick="startGame()">START QUEST</button>
+                <div class="title-footer">MEMORY QUEST : KORIYAMA #9</div>
+            </div>
+        </div>
+
+        <!-- Stage 1: ミッション受領 -->
+        <div class="stage" id="stage1">
+            <div class="stage-header">
+                <h2>STAGE 1: MISSION BRIEFING</h2>
+                <p class="mission-text">ミッション：#9（会場）に到達せよ</p>
+            </div>
+            <div class="mission-container">
+                <div class="mission-item">
+                    <h3>① 日付を確定せよ</h3>
+                    <div class="choice-buttons">
+                        <button class="choice-btn" onclick="selectChoice(1, 1, false)">3月7日（土）</button>
+                        <button class="choice-btn correct" onclick="selectChoice(1, 2, true)">3月8日（日）</button>
+                        <button class="choice-btn" onclick="selectChoice(1, 3, false)">3月9日（月）</button>
+                    </div>
+                </div>
+                <div class="mission-item" id="mission2" style="opacity: 0.5; pointer-events: none;">
+                    <h3>② 時間を確定せよ</h3>
+                    <div class="choice-buttons">
+                        <button class="choice-btn" onclick="selectChoice(2, 1, false)">開場11:00 / 開演11:30</button>
+                        <button class="choice-btn correct" onclick="selectChoice(2, 2, true)">開場11:40 / 開演12:00</button>
+                        <button class="choice-btn" onclick="selectChoice(2, 3, false)">開場12:00 / 開演12:30</button>
+                    </div>
+                </div>
+                <div class="mission-item" id="mission3" style="opacity: 0.5; pointer-events: none;">
+                    <h3>③ "忘れない言葉"を選べ</h3>
+                    <div class="choice-buttons">
+                        <button class="choice-btn" onclick="selectChoice(3, 1, false)">心に刻む日</button>
+                        <button class="choice-btn correct" onclick="selectChoice(3, 2, true)">あの日を忘れない</button>
+                        <button class="choice-btn" onclick="selectChoice(3, 3, false)">記憶の継承</button>
+                    </div>
+                </div>
+            </div>
+            <button class="next-button" id="stage1Next" style="display: none;" onclick="nextStage(2)">NEXT STAGE →</button>
+        </div>
+
+        <!-- Stage 2: ルート選択 -->
+        <div class="stage" id="stage2">
+            <div class="stage-header">
+                <h2>STAGE 2: ROUTE NAVIGATION</h2>
+                <p class="mission-text">会場への道を確定せよ</p>
+            </div>
+            <div class="map-container">
+                <div class="map-route">
+                    <div class="map-point" id="point1" onclick="selectPoint(1)">
+                        <div class="point-icon">📍</div>
+                        <div class="point-label">郡山駅</div>
+                    </div>
+                    <div class="map-arrow">→</div>
+                    <div class="map-point" id="point2" onclick="selectPoint(2)" style="opacity: 0.3;">
+                        <div class="point-icon">🏙️</div>
+                        <div class="point-label">大町</div>
+                    </div>
+                    <div class="map-arrow">→</div>
+                    <div class="map-point" id="point3" onclick="selectPoint(3)" style="opacity: 0.3;">
+                        <div class="point-icon">🎪</div>
+                        <div class="point-label">#9</div>
+                    </div>
+                </div>
+                <div class="venue-info" id="venueInfo" style="display: none;">
+                    <h3>EVENT SPACE Koriyama #9</h3>
+                    <p>📍 郡山市大町1-4-15</p>
+                    <p>📞 024-973-5242</p>
+                    <p class="venue-note">郡山ビル地下1階</p>
+                </div>
+            </div>
+            <button class="next-button" id="stage2Next" style="display: none;" onclick="nextStage(3)">NEXT STAGE →</button>
+        </div>
+
+        <!-- Stage 3: 出演者スキャン -->
+        <div class="stage" id="stage3">
+            <div class="stage-header">
+                <h2>STAGE 3: ARTIST SCAN</h2>
+                <p class="mission-text">出演者を確認せよ（3枚スキャンでコンボ発動）</p>
+            </div>
+            <div class="artist-grid" id="artistGrid">
+                <!-- JavaScript で動的生成 -->
+            </div>
+            <div class="scan-counter">スキャン: <span id="scanCount">0</span> / 3</div>
+            <button class="next-button" id="stage3Next" style="display: none;" onclick="nextStage(4)">NEXT STAGE →</button>
+        </div>
+
+        <!-- Stage 4: 記憶テスト -->
+        <div class="stage" id="stage4">
+            <div class="stage-header">
+                <h2>STAGE 4: MEMORY TEST</h2>
+                <p class="mission-text">記憶を確認せよ</p>
+            </div>
+            <div class="quiz-container">
+                <div class="quiz-item" id="quiz1">
+                    <h3>Q1: イベントの日付は？</h3>
+                    <div class="choice-buttons">
+                        <button class="choice-btn" onclick="answerQuiz(1, 1, false)">3月7日</button>
+                        <button class="choice-btn" onclick="answerQuiz(1, 2, true)">3月8日</button>
+                        <button class="choice-btn" onclick="answerQuiz(1, 3, false)">3月9日</button>
+                    </div>
+                </div>
+                <div class="quiz-item" id="quiz2" style="display: none;">
+                    <h3>Q2: 開演時刻は？</h3>
+                    <div class="choice-buttons">
+                        <button class="choice-btn" onclick="answerQuiz(2, 1, false)">11:40</button>
+                        <button class="choice-btn" onclick="answerQuiz(2, 2, true)">12:00</button>
+                        <button class="choice-btn" onclick="answerQuiz(2, 3, false)">12:30</button>
+                    </div>
+                </div>
+                <div class="quiz-item" id="quiz3" style="display: none;">
+                    <h3>Q3: 会場名は？</h3>
+                    <div class="choice-buttons">
+                        <button class="choice-btn" onclick="answerQuiz(3, 1, false)">郡山市民文化センター</button>
+                        <button class="choice-btn" onclick="answerQuiz(3, 2, true)">Koriyama #9</button>
+                        <button class="choice-btn" onclick="answerQuiz(3, 3, false)">郡山市民会館</button>
+                    </div>
+                </div>
+            </div>
+            <div class="quiz-result" id="quizResult" style="display: none;"></div>
+            <button class="next-button" id="stage4Next" style="display: none;" onclick="nextStage(5)">FINAL STAGE →</button>
+        </div>
+
+        <!-- Stage 5: エンディング -->
+        <div class="stage" id="stage5">
+            <div class="ending-container">
+                <h2 class="ending-title">🎉 QUEST CLEAR! 🎉</h2>
+                <div class="ending-message">
+                    <p>記憶が起動しました。</p>
+                    <p class="ending-code">あなたの合言葉</p>
+                    <div class="code-display" id="codeDisplay">FUKUSHIMA-311-KORIYAMA#9</div>
+                </div>
+                <div class="treasure-box">
+                    <h3>🎁 特典情報</h3>
+                    <div class="treasure-item">✅ 入場無料（全席自由）</div>
+                    <div class="treasure-item">✅ 来場プレゼント先着150名（高校生以下）</div>
+                    <div class="treasure-item">✅ ドリンク代：大人の方を対象に400円</div>
+                </div>
+                <div class="qr-section">
+                    <h3>📱 現地確認用QRコード</h3>
+                    <div class="qr-placeholder">
+                        <p>QRコード</p>
+                        <p style="font-size: 12px;">※イベント公式サイトへ</p>
+                    </div>
+                </div>
+                <div class="final-scores">
+                    <h3>FINAL SCORE</h3>
+                    <div class="score-item">MEMORY: <span id="finalMemory">0</span>%</div>
+                    <div class="score-item">HOPE: <span id="finalHope">0</span>%</div>
+                    <div class="score-item">LINK: <span id="finalLink">0</span>%</div>
+                </div>
+                <button class="share-button" onclick="shareQuest()">📤 シェアする</button>
+                <button class="restart-button" onclick="location.reload()">🔄 もう一度プレイ</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="quest-main.js"></script>
+</body>
+</html>
