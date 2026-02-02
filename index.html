@@ -209,6 +209,20 @@
             margin: 8px 0;
             font-size: 16px;
         }
+
+        .map-point {
+            padding: 20px;
+            background: #2a2a4a;
+            border: 3px solid #444466;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .map-point:hover {
+            transform: scale(1.1);
+            border-color: var(--color-cyan);
+        }
     </style>
 </head>
 <body>
@@ -258,8 +272,91 @@
             <button class="next-button" id="stage1Next" style="display: none;" onclick="nextStage(2)">NEXT STAGE →</button>
         </div>
 
-        <!-- Stage 2: エンディング -->
+        <!-- Stage 2: ルート選択 -->
         <div class="stage" id="stage2">
+            <div class="stage-header">
+                <h2>STAGE 2: ROUTE NAVIGATION</h2>
+                <p style="color: var(--color-yellow);">会場への道を確定せよ</p>
+            </div>
+            
+            <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin: 40px 0; flex-wrap: wrap;">
+                <div class="map-point" id="point1" onclick="selectPoint(1)" style="cursor: pointer;">
+                    <div style="font-size: 40px;">📍</div>
+                    <div style="font-weight: bold;">郡山駅</div>
+                </div>
+                <div style="font-size: 30px; color: var(--color-cyan);">→</div>
+                <div class="map-point" id="point2" onclick="selectPoint(2)" style="opacity: 0.3; cursor: pointer;">
+                    <div style="font-size: 40px;">🏙️</div>
+                    <div style="font-weight: bold;">大町</div>
+                </div>
+                <div style="font-size: 30px; color: var(--color-cyan);">→</div>
+                <div class="map-point" id="point3" onclick="selectPoint(3)" style="opacity: 0.3; cursor: pointer;">
+                    <div style="font-size: 40px;">🎪</div>
+                    <div style="font-weight: bold;">#9</div>
+                </div>
+            </div>
+
+            <div id="venueInfo" style="display: none; padding: 25px; background: rgba(0, 255, 255, 0.1); border: 2px solid var(--color-cyan); border-radius: 8px; text-align: center; margin: 20px 0;">
+                <h3 style="color: var(--color-cyan); margin-bottom: 15px;">EVENT SPACE Koriyama #9</h3>
+                <p>📍 郡山市大町1-4-15</p>
+                <p>📞 024-973-5242</p>
+                <p style="color: var(--color-yellow); margin-top: 10px;">郡山ビル地下1階</p>
+            </div>
+
+            <button class="next-button" id="stage2Next" style="display: none;" onclick="nextStage(3)">NEXT STAGE →</button>
+        </div>
+
+        <!-- Stage 3: 出演者スキャン -->
+        <div class="stage" id="stage3">
+            <div class="stage-header">
+                <h2>STAGE 3: ARTIST SCAN</h2>
+                <p style="color: var(--color-yellow);">出演者を確認せよ（3枚スキャンでクリア）</p>
+            </div>
+            
+            <div id="artistGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 20px 0;"></div>
+            
+            <div style="text-align: center; font-size: 20px; padding: 15px; background: rgba(218, 112, 214, 0.1); border: 2px solid var(--color-purple); border-radius: 8px; color: var(--color-purple); font-weight: bold;">
+                スキャン: <span id="scanCount">0</span> / 3
+            </div>
+
+            <button class="next-button" id="stage3Next" style="display: none;" onclick="nextStage(4)">NEXT STAGE →</button>
+        </div>
+
+        <!-- Stage 4: 記憶テスト -->
+        <div class="stage" id="stage4">
+            <div class="stage-header">
+                <h2>STAGE 4: MEMORY TEST</h2>
+                <p style="color: var(--color-yellow);">記憶を確認せよ</p>
+            </div>
+            
+            <div class="mission-item" id="quiz1">
+                <h3>Q1: イベントの日付は？</h3>
+                <button class="choice-btn" onclick="answerQuiz(1, 1, false)">3月7日</button>
+                <button class="choice-btn" onclick="answerQuiz(1, 2, true)">3月8日</button>
+                <button class="choice-btn" onclick="answerQuiz(1, 3, false)">3月9日</button>
+            </div>
+
+            <div class="mission-item" id="quiz2" style="display: none;">
+                <h3>Q2: 開演時刻は？</h3>
+                <button class="choice-btn" onclick="answerQuiz(2, 1, false)">11:40</button>
+                <button class="choice-btn" onclick="answerQuiz(2, 2, true)">12:00</button>
+                <button class="choice-btn" onclick="answerQuiz(2, 3, false)">12:30</button>
+            </div>
+
+            <div class="mission-item" id="quiz3" style="display: none;">
+                <h3>Q3: 会場名は？</h3>
+                <button class="choice-btn" onclick="answerQuiz(3, 1, false)">郡山市民文化センター</button>
+                <button class="choice-btn" onclick="answerQuiz(3, 2, true)">Koriyama #9</button>
+                <button class="choice-btn" onclick="answerQuiz(3, 3, false)">郡山市民会館</button>
+            </div>
+
+            <div id="quizResult" style="display: none; padding: 20px; text-align: center; font-size: 24px; border-radius: 8px; font-weight: bold; margin: 20px 0;"></div>
+
+            <button class="next-button" id="stage4Next" style="display: none;" onclick="nextStage(5)">FINAL STAGE →</button>
+        </div>
+
+        <!-- Stage 5: エンディング -->
+        <div class="stage" id="stage5">
             <div class="ending-container">
                 <h2 class="ending-title">🎉 QUEST CLEAR! 🎉</h2>
                 <p style="margin: 20px 0;">記憶が起動しました。</p>
@@ -301,6 +398,14 @@
         }
 
         let completedMissions = 0;
+        let routeProgress = 0;
+        let scannedCount = 0;
+        let quizCorrect = 0;
+
+        const artists = [
+            'ラル', '斎藤弘人', '佐藤圭太', '岡田桂子', '橋本初子', '清水貴一',
+            '伊藤和樹', 'ベロワーズ', '大渕ひとみ', '前田誠司', 'KUSANO', 'ペリカ'
+        ];
 
         function selectChoice(missionNum, choiceNum, isCorrect) {
             console.log('選択:', missionNum, choiceNum, isCorrect);
@@ -332,6 +437,133 @@
                 setTimeout(() => clickedButton.classList.remove('wrong'), 500);
             }
         }
+
+        // Stage 2: ルート選択
+        function selectPoint(pointNum) {
+            if (pointNum !== routeProgress + 1) return;
+            
+            const point = document.getElementById('point' + pointNum);
+            point.style.opacity = '1';
+            point.style.background = 'linear-gradient(135deg, var(--color-green), #90EE90)';
+            point.style.color = 'black';
+            
+            routeProgress = pointNum;
+            console.log('ポイント', pointNum, '到達');
+            
+            if (pointNum < 3) {
+                setTimeout(() => {
+                    document.getElementById('point' + (pointNum + 1)).style.opacity = '1';
+                }, 300);
+            } else {
+                // ルート完了
+                setTimeout(() => {
+                    document.getElementById('venueInfo').style.display = 'block';
+                    document.getElementById('stage2Next').style.display = 'block';
+                }, 500);
+            }
+        }
+
+        // Stage 3: 出演者スキャン初期化
+        function initArtistGrid() {
+            const grid = document.getElementById('artistGrid');
+            grid.innerHTML = '';
+            
+            for (let i = 0; i < 12; i++) {
+                const card = document.createElement('div');
+                card.style.cssText = `
+                    aspect-ratio: 1;
+                    background: #2a2a4a;
+                    border: 2px solid #444466;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 14px;
+                    text-align: center;
+                    padding: 10px;
+                    position: relative;
+                `;
+                card.innerHTML = '<div style="font-size: 60px; color: #666;">?</div>';
+                card.onclick = () => scanArtist(card, i);
+                grid.appendChild(card);
+            }
+        }
+
+        function scanArtist(card, index) {
+            if (card.dataset.scanned) return;
+            
+            card.dataset.scanned = 'true';
+            card.style.background = 'linear-gradient(135deg, var(--color-purple), #E587E5)';
+            card.innerHTML = `<div style="font-size: 80px;">✓</div><div style="font-size: 12px; margin-top: 5px;">${artists[index]}</div>`;
+            
+            scannedCount++;
+            document.getElementById('scanCount').textContent = scannedCount;
+            console.log('スキャン:', scannedCount, '/3');
+            
+            if (scannedCount === 3) {
+                setTimeout(() => {
+                    document.getElementById('stage3Next').style.display = 'block';
+                }, 500);
+            }
+        }
+
+        // Stage 4: クイズ
+        function answerQuiz(quizNum, answerNum, isCorrect) {
+            console.log('クイズ', quizNum, '回答:', answerNum, isCorrect);
+            
+            const quiz = document.getElementById('quiz' + quizNum);
+            const buttons = quiz.querySelectorAll('.choice-btn');
+            const clickedButton = buttons[answerNum - 1];
+
+            if (isCorrect) {
+                clickedButton.classList.add('selected');
+                buttons.forEach(btn => btn.disabled = true);
+                quizCorrect++;
+
+                setTimeout(() => {
+                    quiz.style.display = 'none';
+                    
+                    if (quizNum < 3) {
+                        document.getElementById('quiz' + (quizNum + 1)).style.display = 'block';
+                    } else {
+                        // クイズ完了
+                        const result = document.getElementById('quizResult');
+                        result.style.display = 'block';
+                        
+                        if (quizCorrect === 3) {
+                            result.textContent = '🎉 PERFECT! 記憶完璧！';
+                            result.style.background = 'linear-gradient(135deg, var(--color-green), #90EE90)';
+                            result.style.color = 'black';
+                        } else {
+                            result.textContent = `正解: ${quizCorrect} / 3`;
+                            result.style.background = 'rgba(255, 215, 0, 0.2)';
+                            result.style.color = 'var(--color-yellow)';
+                        }
+                        
+                        setTimeout(() => {
+                            document.getElementById('stage4Next').style.display = 'block';
+                        }, 1000);
+                    }
+                }, 500);
+            } else {
+                clickedButton.classList.add('wrong');
+                setTimeout(() => clickedButton.classList.remove('wrong'), 500);
+            }
+        }
+
+        // ステージ遷移時の処理
+        const originalNextStage = nextStage;
+        nextStage = function(stageNum) {
+            console.log('Stage', stageNum, 'へ遷移');
+            
+            // Stage 3に入るときに出演者グリッドを初期化
+            if (stageNum === 3) {
+                setTimeout(() => initArtistGrid(), 100);
+            }
+            
+            originalNextStage(stageNum);
+        };
 
         console.log('準備完了！');
     </script>
