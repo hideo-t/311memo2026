@@ -1,202 +1,339 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3.11メモリークエスト：#9へ集合</title>
-    <link rel="stylesheet" href="quest-style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-yellow: #FFD700;
+            --color-green: #7FFF00;
+            --color-cyan: #00FFFF;
+            --color-purple: #DA70D6;
+            --bg-dark: #0a0a1a;
+            --bg-game: #1a1a2e;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, var(--bg-dark), var(--bg-game));
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+
+        .game-container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--bg-game);
+            border: 4px solid #444466;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+
+        .stage {
+            display: none;
+        }
+
+        .stage.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* タイトル画面 */
+        .title-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .title-main {
+            font-size: 32px;
+            margin: 20px 0;
+            background: linear-gradient(90deg, var(--color-yellow), var(--color-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .title-sub {
+            font-size: 24px;
+            margin: 20px 0;
+            color: var(--color-cyan);
+        }
+
+        .start-button {
+            padding: 20px 60px;
+            font-size: 24px;
+            background: linear-gradient(135deg, var(--color-cyan), var(--color-purple));
+            border: 3px solid white;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            margin: 30px 0;
+            font-weight: bold;
+        }
+
+        .start-button:hover {
+            transform: scale(1.1);
+        }
+
+        /* ミッション画面 */
+        .stage-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid #444466;
+            border-radius: 8px;
+        }
+
+        .stage-header h2 {
+            font-size: 24px;
+            color: var(--color-cyan);
+            margin-bottom: 10px;
+        }
+
+        .mission-item {
+            margin: 25px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid #444466;
+            border-radius: 8px;
+        }
+
+        .mission-item h3 {
+            color: var(--color-yellow);
+            margin-bottom: 15px;
+        }
+
+        .choice-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: #2a2a4a;
+            border: 2px solid #444466;
+            color: white;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .choice-btn:hover {
+            background: #3a3a6a;
+            border-color: var(--color-cyan);
+        }
+
+        .choice-btn.selected {
+            background: linear-gradient(135deg, var(--color-green), #90EE90);
+            border-color: var(--color-green);
+            color: black;
+            font-weight: bold;
+        }
+
+        .choice-btn.wrong {
+            background: #ff4444;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .next-button {
+            display: block;
+            margin: 30px auto;
+            padding: 15px 40px;
+            font-size: 18px;
+            background: linear-gradient(135deg, var(--color-cyan), var(--color-purple));
+            border: 2px solid var(--color-cyan);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .next-button:hover {
+            transform: scale(1.05);
+        }
+
+        /* エンディング */
+        .ending-container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .ending-title {
+            font-size: 32px;
+            margin: 20px 0;
+            color: var(--color-yellow);
+        }
+
+        .code-display {
+            padding: 20px;
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid var(--color-cyan);
+            border-radius: 8px;
+            font-size: 20px;
+            color: var(--color-cyan);
+            margin: 20px 0;
+        }
+
+        .treasure-box {
+            background: rgba(255, 215, 0, 0.1);
+            border: 3px solid var(--color-yellow);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .treasure-item {
+            padding: 10px;
+            margin: 8px 0;
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
     <div class="game-container">
-        <!-- スコアゲージ -->
-        <div class="gauge-container" id="gaugeContainer">
-            <div class="gauge">
-                <div class="gauge-label">MEMORY</div>
-                <div class="gauge-bar">
-                    <div class="gauge-fill memory" id="memoryGauge"></div>
-                </div>
-            </div>
-            <div class="gauge">
-                <div class="gauge-label">HOPE</div>
-                <div class="gauge-bar">
-                    <div class="gauge-fill hope" id="hopeGauge"></div>
-                </div>
-            </div>
-            <div class="gauge">
-                <div class="gauge-label">LINK</div>
-                <div class="gauge-bar">
-                    <div class="gauge-fill link" id="linkGauge"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Stage 0: タイトル画面 -->
+        <!-- Stage 0: タイトル -->
         <div class="stage active" id="stage0">
             <div class="title-screen">
-                <div class="title-badge">第5回</div>
+                <div style="background: var(--color-cyan); color: black; padding: 8px 20px; border-radius: 20px; display: inline-block; margin-bottom: 20px;">第5回</div>
                 <h1 class="title-main">福島の子供たちのために</h1>
                 <h2 class="title-sub">3.11 〜あの日を忘れない〜</h2>
-                <div class="title-info">
-                    <div class="info-badge">入場無料</div>
-                    <div class="info-badge">全席自由</div>
+                <div style="margin: 20px 0;">
+                    <span style="background: #ff1493; padding: 10px 20px; border-radius: 25px; margin: 5px;">入場無料</span>
+                    <span style="background: #ff1493; padding: 10px 20px; border-radius: 25px; margin: 5px;">全席自由</span>
                 </div>
                 <button class="start-button" onclick="startGame()">START QUEST</button>
-                <div class="title-footer">MEMORY QUEST : KORIYAMA #9</div>
             </div>
         </div>
 
-        <!-- Stage 1: ミッション受領 -->
+        <!-- Stage 1: ミッション -->
         <div class="stage" id="stage1">
             <div class="stage-header">
                 <h2>STAGE 1: MISSION BRIEFING</h2>
-                <p class="mission-text">ミッション：#9（会場）に到達せよ</p>
+                <p style="color: var(--color-yellow);">ミッション：#9（会場）に到達せよ</p>
             </div>
-            <div class="mission-container">
-                <div class="mission-item">
-                    <h3>① 日付を確定せよ</h3>
-                    <div class="choice-buttons">
-                        <button class="choice-btn" onclick="selectChoice(1, 1, false)">3月7日（土）</button>
-                        <button class="choice-btn correct" onclick="selectChoice(1, 2, true)">3月8日（日）</button>
-                        <button class="choice-btn" onclick="selectChoice(1, 3, false)">3月9日（月）</button>
-                    </div>
-                </div>
-                <div class="mission-item" id="mission2" style="opacity: 0.5; pointer-events: none;">
-                    <h3>② 時間を確定せよ</h3>
-                    <div class="choice-buttons">
-                        <button class="choice-btn" onclick="selectChoice(2, 1, false)">開場11:00 / 開演11:30</button>
-                        <button class="choice-btn correct" onclick="selectChoice(2, 2, true)">開場11:40 / 開演12:00</button>
-                        <button class="choice-btn" onclick="selectChoice(2, 3, false)">開場12:00 / 開演12:30</button>
-                    </div>
-                </div>
-                <div class="mission-item" id="mission3" style="opacity: 0.5; pointer-events: none;">
-                    <h3>③ "忘れない言葉"を選べ</h3>
-                    <div class="choice-buttons">
-                        <button class="choice-btn" onclick="selectChoice(3, 1, false)">心に刻む日</button>
-                        <button class="choice-btn correct" onclick="selectChoice(3, 2, true)">あの日を忘れない</button>
-                        <button class="choice-btn" onclick="selectChoice(3, 3, false)">記憶の継承</button>
-                    </div>
-                </div>
+            
+            <div class="mission-item" id="mission1">
+                <h3>① 日付を確定せよ</h3>
+                <button class="choice-btn" onclick="selectChoice(1, 1, false)">3月7日（土）</button>
+                <button class="choice-btn" onclick="selectChoice(1, 2, true)">3月8日（日）</button>
+                <button class="choice-btn" onclick="selectChoice(1, 3, false)">3月9日（月）</button>
             </div>
+
+            <div class="mission-item" id="mission2" style="opacity: 0.3; pointer-events: none;">
+                <h3>② 時間を確定せよ</h3>
+                <button class="choice-btn" onclick="selectChoice(2, 1, false)">開場11:00 / 開演11:30</button>
+                <button class="choice-btn" onclick="selectChoice(2, 2, true)">開場11:40 / 開演12:00</button>
+                <button class="choice-btn" onclick="selectChoice(2, 3, false)">開場12:00 / 開演12:30</button>
+            </div>
+
+            <div class="mission-item" id="mission3" style="opacity: 0.3; pointer-events: none;">
+                <h3>③ "忘れない言葉"を選べ</h3>
+                <button class="choice-btn" onclick="selectChoice(3, 1, false)">心に刻む日</button>
+                <button class="choice-btn" onclick="selectChoice(3, 2, true)">あの日を忘れない</button>
+                <button class="choice-btn" onclick="selectChoice(3, 3, false)">記憶の継承</button>
+            </div>
+
             <button class="next-button" id="stage1Next" style="display: none;" onclick="nextStage(2)">NEXT STAGE →</button>
         </div>
 
-        <!-- Stage 2: ルート選択 -->
+        <!-- Stage 2: エンディング -->
         <div class="stage" id="stage2">
-            <div class="stage-header">
-                <h2>STAGE 2: ROUTE NAVIGATION</h2>
-                <p class="mission-text">会場への道を確定せよ</p>
-            </div>
-            <div class="map-container">
-                <div class="map-route">
-                    <div class="map-point" id="point1" onclick="selectPoint(1)">
-                        <div class="point-icon">📍</div>
-                        <div class="point-label">郡山駅</div>
-                    </div>
-                    <div class="map-arrow">→</div>
-                    <div class="map-point" id="point2" onclick="selectPoint(2)" style="opacity: 0.3;">
-                        <div class="point-icon">🏙️</div>
-                        <div class="point-label">大町</div>
-                    </div>
-                    <div class="map-arrow">→</div>
-                    <div class="map-point" id="point3" onclick="selectPoint(3)" style="opacity: 0.3;">
-                        <div class="point-icon">🎪</div>
-                        <div class="point-label">#9</div>
-                    </div>
-                </div>
-                <div class="venue-info" id="venueInfo" style="display: none;">
-                    <h3>EVENT SPACE Koriyama #9</h3>
-                    <p>📍 郡山市大町1-4-15</p>
-                    <p>📞 024-973-5242</p>
-                    <p class="venue-note">郡山ビル地下1階</p>
-                </div>
-            </div>
-            <button class="next-button" id="stage2Next" style="display: none;" onclick="nextStage(3)">NEXT STAGE →</button>
-        </div>
-
-        <!-- Stage 3: 出演者スキャン -->
-        <div class="stage" id="stage3">
-            <div class="stage-header">
-                <h2>STAGE 3: ARTIST SCAN</h2>
-                <p class="mission-text">出演者を確認せよ（3枚スキャンでコンボ発動）</p>
-            </div>
-            <div class="artist-grid" id="artistGrid">
-                <!-- JavaScript で動的生成 -->
-            </div>
-            <div class="scan-counter">スキャン: <span id="scanCount">0</span> / 3</div>
-            <button class="next-button" id="stage3Next" style="display: none;" onclick="nextStage(4)">NEXT STAGE →</button>
-        </div>
-
-        <!-- Stage 4: 記憶テスト -->
-        <div class="stage" id="stage4">
-            <div class="stage-header">
-                <h2>STAGE 4: MEMORY TEST</h2>
-                <p class="mission-text">記憶を確認せよ</p>
-            </div>
-            <div class="quiz-container">
-                <div class="quiz-item" id="quiz1">
-                    <h3>Q1: イベントの日付は？</h3>
-                    <div class="choice-buttons">
-                        <button class="choice-btn" onclick="answerQuiz(1, 1, false)">3月7日</button>
-                        <button class="choice-btn" onclick="answerQuiz(1, 2, true)">3月8日</button>
-                        <button class="choice-btn" onclick="answerQuiz(1, 3, false)">3月9日</button>
-                    </div>
-                </div>
-                <div class="quiz-item" id="quiz2" style="display: none;">
-                    <h3>Q2: 開演時刻は？</h3>
-                    <div class="choice-buttons">
-                        <button class="choice-btn" onclick="answerQuiz(2, 1, false)">11:40</button>
-                        <button class="choice-btn" onclick="answerQuiz(2, 2, true)">12:00</button>
-                        <button class="choice-btn" onclick="answerQuiz(2, 3, false)">12:30</button>
-                    </div>
-                </div>
-                <div class="quiz-item" id="quiz3" style="display: none;">
-                    <h3>Q3: 会場名は？</h3>
-                    <div class="choice-buttons">
-                        <button class="choice-btn" onclick="answerQuiz(3, 1, false)">郡山市民文化センター</button>
-                        <button class="choice-btn" onclick="answerQuiz(3, 2, true)">Koriyama #9</button>
-                        <button class="choice-btn" onclick="answerQuiz(3, 3, false)">郡山市民会館</button>
-                    </div>
-                </div>
-            </div>
-            <div class="quiz-result" id="quizResult" style="display: none;"></div>
-            <button class="next-button" id="stage4Next" style="display: none;" onclick="nextStage(5)">FINAL STAGE →</button>
-        </div>
-
-        <!-- Stage 5: エンディング -->
-        <div class="stage" id="stage5">
             <div class="ending-container">
                 <h2 class="ending-title">🎉 QUEST CLEAR! 🎉</h2>
-                <div class="ending-message">
-                    <p>記憶が起動しました。</p>
-                    <p class="ending-code">あなたの合言葉</p>
-                    <div class="code-display" id="codeDisplay">FUKUSHIMA-311-KORIYAMA#9</div>
-                </div>
+                <p style="margin: 20px 0;">記憶が起動しました。</p>
+                <p style="color: #aaa;">あなたの合言葉</p>
+                <div class="code-display">FUKUSHIMA-311-KORIYAMA#9</div>
+                
                 <div class="treasure-box">
-                    <h3>🎁 特典情報</h3>
+                    <h3 style="color: var(--color-yellow); margin-bottom: 15px;">🎁 イベント情報</h3>
+                    <div class="treasure-item">📅 3月8日（日）</div>
+                    <div class="treasure-item">🕐 開場11:40 / 開演12:00</div>
+                    <div class="treasure-item">📍 EVENT SPACE Koriyama #9</div>
+                    <div class="treasure-item">🏢 郡山市大町1-4-15 郡山ビル地下1階</div>
                     <div class="treasure-item">✅ 入場無料（全席自由）</div>
-                    <div class="treasure-item">✅ 来場プレゼント先着150名（高校生以下）</div>
-                    <div class="treasure-item">✅ ドリンク代：大人の方を対象に400円</div>
+                    <div class="treasure-item">🎁 来場プレゼント先着150名（高校生以下）</div>
                 </div>
-                <div class="qr-section">
-                    <h3>📱 現地確認用QRコード</h3>
-                    <div class="qr-placeholder">
-                        <p>QRコード</p>
-                        <p style="font-size: 12px;">※イベント公式サイトへ</p>
-                    </div>
-                </div>
-                <div class="final-scores">
-                    <h3>FINAL SCORE</h3>
-                    <div class="score-item">MEMORY: <span id="finalMemory">0</span>%</div>
-                    <div class="score-item">HOPE: <span id="finalHope">0</span>%</div>
-                    <div class="score-item">LINK: <span id="finalLink">0</span>%</div>
-                </div>
-                <button class="share-button" onclick="shareQuest()">📤 シェアする</button>
-                <button class="restart-button" onclick="location.reload()">🔄 もう一度プレイ</button>
+
+                <button class="next-button" onclick="location.reload()">🔄 もう一度プレイ</button>
             </div>
         </div>
     </div>
 
-    <script defer src="quest-main.js"></script>
+    <script>
+        console.log('🎮 3.11メモリークエスト起動');
+
+        function startGame() {
+            console.log('ゲーム開始');
+            nextStage(1);
+        }
+
+        function nextStage(stageNum) {
+            console.log('Stage', stageNum, 'へ遷移');
+            document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+            const stage = document.getElementById('stage' + stageNum);
+            if (stage) {
+                stage.classList.add('active');
+                console.log('Stage', stageNum, '表示成功');
+            }
+            window.scrollTo(0, 0);
+        }
+
+        let completedMissions = 0;
+
+        function selectChoice(missionNum, choiceNum, isCorrect) {
+            console.log('選択:', missionNum, choiceNum, isCorrect);
+            
+            const mission = document.getElementById('mission' + missionNum);
+            const buttons = mission.querySelectorAll('.choice-btn');
+            const clickedButton = buttons[choiceNum - 1];
+
+            if (isCorrect) {
+                // 正解
+                clickedButton.classList.add('selected');
+                buttons.forEach(btn => btn.disabled = true);
+                completedMissions++;
+
+                setTimeout(() => {
+                    if (missionNum < 3) {
+                        // 次のミッションをアンロック
+                        const nextMission = document.getElementById('mission' + (missionNum + 1));
+                        nextMission.style.opacity = '1';
+                        nextMission.style.pointerEvents = 'auto';
+                    } else {
+                        // 全ミッション完了
+                        document.getElementById('stage1Next').style.display = 'block';
+                    }
+                }, 500);
+            } else {
+                // 不正解
+                clickedButton.classList.add('wrong');
+                setTimeout(() => clickedButton.classList.remove('wrong'), 500);
+            }
+        }
+
+        console.log('準備完了！');
+    </script>
 </body>
 </html>
